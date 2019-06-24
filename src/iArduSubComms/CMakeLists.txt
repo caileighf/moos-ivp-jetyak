@@ -10,11 +10,12 @@ SET(SRC
   main.cpp
 )
 
+include_directories(${boost_INCLUDE_DIR})
+
 ADD_EXECUTABLE(iArduSubComms ${SRC})
 
 TARGET_LINK_LIBRARIES(iArduSubComms
    ${MOOS_LIBRARIES}
-   boost_system
    apputil
    mbutil
    m

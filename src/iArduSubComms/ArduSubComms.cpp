@@ -18,7 +18,7 @@
 
 // TOGGLE_PORT 1 for Enabling Comms via UDP (for BlueROV2 control (or in SITL) from MOOS running on GCS)
 // TOGGLE_PORT 0 for Enabling Comms via SERIAL Port (for BlueROV2 control from MOOS running on companion computer onboard)
-#define TOGGLE_PORT 0
+#define TOGGLE_PORT 1
 
 using namespace std;
 

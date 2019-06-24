@@ -95,7 +95,7 @@ command line:
 To test our moos-ivp-bluerov extension in simulation, we will first need to setup 
 SITL to run with ArduSub. Execute the following from the command line:
 
-	$ cd ~
+	$ cd ~/repos/
 	$ git clone git://github.com/ArduPilot/ardupilot.git
 	$ cd ardupilot
 	$ git submodule update --init --recursive
