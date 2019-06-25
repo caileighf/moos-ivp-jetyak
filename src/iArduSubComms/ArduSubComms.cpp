@@ -142,7 +142,7 @@ bool ArduSubComms::OnStartUp()
       handled = true;
     }
     else if(param == "BAUD") {
-      m_mavlink_baud = value
+      m_mavlink_baud = atoi(value.c_str());
       handled = true;
     }
     else if(param == "COMPANION_COMPUTER") {
