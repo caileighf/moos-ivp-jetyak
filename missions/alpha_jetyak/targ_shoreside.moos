@@ -24,16 +24,12 @@ ProcessConfig = ANTLER
 
   Run = MOOSDB          @ NewConsole = false
   Run = pLogger         @ NewConsole = false
-#ifdef SIM 
   Run = uSimMarine	    @ NewConsole = false
   Run = pMarineViewer   @ NewConsole = false
-#endif
   Run = pMarinePID      @ NewConsole = false
   Run = pHelmIvP        @ NewConsole = false
   Run = uProcessWatch	  @ NewConsole = false
   Run = pNodeReporter	  @ NewConsole = false
-  Run = pMavlinkConverter @ Newconsole = false
-  Run = iArduSubComms @ Newconsole = false
 }
 
 //------------------------------------------
@@ -221,25 +217,3 @@ ProcessConfig = pNodeReporter
   platform_length = 4
 }
 
-//------------------------------------------------
-// pMavlinkConverter config block
-
-ProcessConfig = pMavlinkConverter
-{
-   AppTick   = 4
-   CommsTick = 4
-}
-
-//------------------------------------------------
-// iArduSubComms config block
-
-ProcessConfig = iArduSubComms
-{
-  COMPANION_COMPUTER = true
-
-  PORT = /dev/ttyAMA0
-  BAUD = 115200
-
-   AppTick   = 4
-   CommsTick = 4
-}
