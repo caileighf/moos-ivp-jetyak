@@ -27,6 +27,8 @@ for ARGI; do
         SHORE_IP="${ARGI#--shore-ip=*}"
     elif [ "${ARGI:0:13}" = "--shore-port=" ] ; then
         SHORE_LISTEN=${ARGI#--shore-port=*}
+    elif [ "${ARGI}" = "--debug" -o "${ARGI}" = "-d" ] ; then
+        DEBUG=true
     else
         echo "Bad Argument: " $ARGI
         exit 1
@@ -36,12 +38,17 @@ done
 #-------------------------------------------------------
 #  Part 1: Create the Shoreside MOOS file
 #-------------------------------------------------------
+if [ DEBUG ] ; then
+    echo "about to create meta_shoreside.moos targ_shoreside.moos"
+    echo "  SNAME=\"shoreside\" & SHARE_LISTEN=${SHORE_LISTEN} & SHORE_IP=${SHORE_IP} & SPORT=\"9000\""
+fi
 nsplug meta_shoreside.moos targ_shoreside.moos -f WARP=$TIME_WARP    \
        SNAME="shoreside"  SHARE_LISTEN=$SHORE_LISTEN  SPORT="9000"   \
        VTEAM1=$VTEAM1 VTEAM2=$VTEAM2 SHORE_IP=$SHORE_IP              \
        RED_FLAG=${RED_FLAG} BLUE_FLAG=${BLUE_FLAG}
 
 if [ ! -e targ_shoreside.moos ]; then echo "no targ_shoreside.moos"; exit 1; fi
+if [ ! -e meta_shoreside.moos ]; then echo "no meta_shoreside.moos"; exit 1; fi
 
 #-------------------------------------------------------
 #  Part 2: Possibly exit now if we're just building targ files
@@ -64,3 +71,4 @@ uMAC targ_shoreside.moos
 echo "Killing all processes ... "
 kill -- -$$
 echo "Done killing processes.   "
+
