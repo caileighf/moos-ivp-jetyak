@@ -23,6 +23,7 @@ ProcessConfig = ANTLER
 
   Run = MOOSDB          @ NewConsole = false
   Run = pLogger         @ NewConsole = false
+  Run = pShare          @ Newconsole = false
 #ifdef SIM 
   Run = uSimMarine	    @ NewConsole = false
   Run = pMarineViewer   @ NewConsole = false
@@ -241,4 +242,14 @@ ProcessConfig = iArduSubComms
 
    AppTick   = 4
    CommsTick = 4
+}
+
+//---------------------------------------------------------
+ProcessConfig = pShare
+{
+  AppTick    = 2
+  CommsTick  = 2
+
+  input = route =  localhost:$(SHARE_LISTEN)
+//  input = route =  multicast_7
 }
