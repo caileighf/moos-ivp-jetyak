@@ -24,10 +24,10 @@ UNTAG_POS=""
 for ARGI; do
     if [ "${ARGI}" = "--help" -o "${ARGI}" = "-h" ] ; then
         HELP="yes"
-    elif [ "${ARGI}" = "--shore-ip=" ] ; then
-        SHORE_IP=$ARGI
-    elif [ "${ARGI}" = "--shore-listen=" ] ; then
-        SHORE_LISTEN=$ARGI
+    elif [ "${ARGI:0:11}" = "--shore-ip=" ] ; then
+        SHORE_IP="${ARGI#--shore-ip=*}"
+    elif [ "${ARGI:0:13}" = "--shore-port=" ] ; then
+        SHORE_LISTEN=${ARGI#--shore-port=*}
     elif [ "${ARGI//[^0-9]/}" = "$ARGI" -a "$TIME_WARP" = 1 ]; then
         TIME_WARP=$ARGI
     elif [ "${ARGI}" = "--jetyak_1" -o "${ARGI}" = "-j1" ] ; then
