@@ -3,9 +3,9 @@
 #  Part 1: Check for and handle command-line arguments
 #-------------------------------------------------------
 
-VNAME="jetyak"           # The first vehicle Community
-START_POS="100,-30"         
-LOITER_POS="x=0,y=-75"
+VNAME="source"           # The second vehicle Community        
+START_POS="50,-100"    
+LOITER_POS="x=50,y=-100"
 SHORE_LISTEN="9300"
 SHORE_IP="172.20.10.10"
 
@@ -33,14 +33,14 @@ done
 
 #-------------------------------------------------------
 #  Part 2: Create the .moos and .bhv files. 
-#-------------------------------------------------------
-nsplug meta_vehicle.moos targ_$VNAME.moos -f WARP=$TIME_WARP \
-    VNAME=$VNAME          SHARE_LISTEN="9301"              \
-    VPORT="9001"           SHORE_LISTEN=$SHORE_LISTEN       \
+#------------------------------------------------------
+nsplug meta_source.moos targ_$VNAME.moos -f WARP=$TIME_WARP \
+    VNAME=$VNAME          SHARE_LISTEN="9302"              \
+    VPORT="9002"           SHORE_LISTEN=$SHORE_LISTEN       \
     START_POS=$START_POS  SHORE_IP=$SHORE_IP 
 
-nsplug meta_vehicle.bhv targ_$VNAME1.bhv -f VNAME=$VNAME     \
-    START_POS=$START_POS LOITER_POS=$LOITER_POS    
+nsplug meta_source.bhv targ_$VNAME.bhv -f VNAME=$VNAME     \
+    START_POS=$START_POS LOITER_POS=$LOITER_POS       
 
 if [ ${JUST_MAKE} = "yes" ] ; then
     exit 0
@@ -53,7 +53,7 @@ printf "Launching $VNAME MOOS Community (WARP=%s) \n" $TIME_WARP
 pAntler targ_$VNAME.moos >& /dev/null &
 printf "Done \n"
 
-uMAC targ_jetyak.moos
+uMAC targ_source.moos
 
 printf "Killing all processes ... \n"
 kill %1 %2 %3

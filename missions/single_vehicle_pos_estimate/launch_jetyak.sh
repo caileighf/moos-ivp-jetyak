@@ -3,9 +3,12 @@
 #  Part 1: Check for and handle command-line arguments
 #-------------------------------------------------------
 
-VNAME="jetyak"           # The first vehicle Community
-START_POS="100,-30"         
-LOITER_POS="x=0,y=-75"
+VNAME1="jetyak"           # The first vehicle Community
+VNAME2="source"           # The second vehicle Community
+START_POS1="100,-30"         
+START_POS2="50,-100"        
+LOITER_POS1="x=0,y=-75"
+LOITER_POS2="x=50,y=-100"
 SHORE_LISTEN="9300"
 SHORE_IP="172.20.10.10"
 
@@ -34,13 +37,21 @@ done
 #-------------------------------------------------------
 #  Part 2: Create the .moos and .bhv files. 
 #-------------------------------------------------------
-nsplug meta_vehicle.moos targ_$VNAME.moos -f WARP=$TIME_WARP \
-    VNAME=$VNAME          SHARE_LISTEN="9301"              \
+nsplug meta_vehicle.moos targ_$VNAME1.moos -f WARP=$TIME_WARP \
+    VNAME=$VNAME1          SHARE_LISTEN="9301"              \
     VPORT="9001"           SHORE_LISTEN=$SHORE_LISTEN       \
-    START_POS=$START_POS  SHORE_IP=$SHORE_IP 
+    START_POS=$START_POS1  SHORE_IP=$SHORE_IP 
 
-nsplug meta_vehicle.bhv targ_$VNAME1.bhv -f VNAME=$VNAME     \
-    START_POS=$START_POS LOITER_POS=$LOITER_POS    
+nsplug meta_source.moos targ_$VNAME2.moos -f WARP=$TIME_WARP \
+    VNAME=$VNAME2          SHARE_LISTEN="9302"              \
+    VPORT="9002"           SHORE_LISTEN=$SHORE_LISTEN       \
+    START_POS=$START_POS2  SHORE_IP=$SHORE_IP 
+
+nsplug meta_vehicle.bhv targ_$VNAME1.bhv -f VNAME=$VNAME1     \
+    START_POS=$START_POS1 LOITER_POS=$LOITER_POS1    
+
+nsplug meta_source.bhv targ_$VNAME2.bhv -f VNAME=$VNAME2     \
+    START_POS=$START_POS2 LOITER_POS=$LOITER_POS2       
 
 if [ ${JUST_MAKE} = "yes" ] ; then
     exit 0
@@ -49,8 +60,10 @@ fi
 #-------------------------------------------------------
 #  Part 3: Launch the processes
 #-------------------------------------------------------
-printf "Launching $VNAME MOOS Community (WARP=%s) \n" $TIME_WARP
-pAntler targ_$VNAME.moos >& /dev/null &
+printf "Launching $VNAME1 MOOS Community (WARP=%s) \n" $TIME_WARP
+pAntler targ_$VNAME1.moos >& /dev/null &
+printf "Launching $VNAME2 MOOS Community (WARP=%s) \n" $TIME_WARP
+pAntler targ_$VNAME2.moos >& /dev/null &
 printf "Done \n"
 
 uMAC targ_jetyak.moos
