@@ -25,7 +25,8 @@ Processconfig = ANTLER
   Run = uFldMessageHandler  @ NewConsole = false
   Run = pGenerateBRG        @ NewConsole = false
   Run = pPositionEstimate   @ NewConsole = false
-  //Run = uTimerScript        @ NewConsole = false
+  Run = pMavlinkConverter @ Newconsole = false
+  Run = iArduSubComms @ Newconsole = false
 }
 
 #include plug_uFldNodeBroker.moos
@@ -41,4 +42,25 @@ Processconfig = ANTLER
 #include plug_uFldMessageHandler.moos
 #include plug_pGenerateBRG.moos
 #include plug_pPositionEstimate.moos
+//------------------------------------------------
+// pMavlinkConverter config block
 
+ProcessConfig = pMavlinkConverter
+{
+   AppTick   = 4
+   CommsTick = 4
+}
+
+//------------------------------------------------
+// iArduSubComms config block
+
+ProcessConfig = iArduSubComms
+{
+  COMPANION_COMPUTER = true
+
+  PORT = /dev/ttyAMA0
+  BAUD = 115200
+
+   AppTick   = 4
+   CommsTick = 4
+}
