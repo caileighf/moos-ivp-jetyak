@@ -1,0 +1,8 @@
+//------------------------------------------------------
+// pGenerateBRG Configuration Block  (Created from plugin)
+
+ProcessConfig = pGenerateBRG
+{
+  AppTick    = 1
+  CommsTick  = 1
+}

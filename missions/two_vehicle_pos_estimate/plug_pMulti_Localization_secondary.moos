@@ -1,0 +1,10 @@
+//------------------------------------------------------
+// pMulti_Localization Configuration Block  (Created from plugin)
+
+ProcessConfig = pMulti_Localization
+{
+  AppTick    = 1
+  CommsTick  = 1
+
+  PRIMARY = false
+}

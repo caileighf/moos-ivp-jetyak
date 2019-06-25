@@ -1,0 +1,8 @@
+//------------------------------------------------------
+// pSingle_Localization Configuration Block  (Created from plugin)
+
+ProcessConfig = pSingle_Localization
+{
+  AppTick    = 1
+  CommsTick  = 1
+}

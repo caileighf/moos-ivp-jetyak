@@ -1,0 +1,10 @@
+//------------------------------------------------------
+// pMulti_TMA_secondary Configuration Block  (Created from plugin)
+
+ProcessConfig = pMulti_TMA
+{
+  AppTick    = 1
+  CommsTick  = 1
+
+  PRIMARY = false
+}
