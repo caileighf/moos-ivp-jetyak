@@ -13,7 +13,7 @@ for ARGI; do
     elif [ "${ARGI//[^0-9]/}" = "$ARGI" -a "$TIME_WARP" = 1 ]; then 
         TIME_WARP=$ARGI
     elif [ "${ARGI}" = "--just_build" -o "${ARGI}" = "-j" ] ; then
-	JUST_MAKE="yes"
+	    JUST_MAKE="yes"
     else 
 	printf "Bad Argument: %s \n" $ARGI
 	exit 0
@@ -24,7 +24,7 @@ done
 #  Part 2: Create the .moos and .bhv files. 
 #-------------------------------------------------------
 nsplug meta_shoreside.moos targ_shoreside.moos -f WARP=$TIME_WARP \
-    SNAME="shoreside"  SHARE_LISTEN=$SHORE_LISTEN                 \
+    SNAME="shoreside"  SHARE_LISTEN="9300"                \
     SPORT="9000"           
 
 if [ ${JUST_MAKE} = "yes" ] ; then
