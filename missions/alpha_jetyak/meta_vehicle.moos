@@ -27,8 +27,8 @@ ProcessConfig = ANTLER
   Run = pShare          @ NewConsole = false
   Run = uFldMessageHandler @ NewConsole = false
   Run = uFldNodeBroker  @ NewConsole = false
-#ifdef SIM 
   Run = uSimMarine	    @ NewConsole = false
+#ifdef SIM 
   Run = pMarineViewer   @ NewConsole = false
 #endif
   Run = pMarinePID      @ NewConsole = false
@@ -87,6 +87,8 @@ ProcessConfig = uSimMarine
   start_y       = 0
   start_heading = 0
   start_speed   = 0
+
+  START_POS = $(START_POS), 180, 0
 
   prefix        = NAV
 

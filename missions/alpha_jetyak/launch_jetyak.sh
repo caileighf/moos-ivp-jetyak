@@ -20,6 +20,7 @@ RETURN_POS="5,0"
 LOITER_POS="x=100,y=-180"
 GRAB_POS=""
 UNTAG_POS=""
+START_POS="0,0"
 
 #-------------------------------------------------------
 #  Part 1: Check for and handle command-line arguments

@@ -23,10 +23,9 @@ ProcessConfig = ANTLER
 
   Run = MOOSDB          @ NewConsole = false
   Run = pLogger         @ NewConsole = false
-  Run = uSimMarine	    @ NewConsole = false
+ // Run = uSimMarine	    @ NewConsole = false
   Run = pMarineViewer   @ NewConsole = false
   Run = pMarinePID      @ NewConsole = false
-  Run = pHelmIvP        @ NewConsole = false
   Run = uProcessWatch	  @ NewConsole = false
   Run = pNodeReporter	  @ NewConsole = false
   Run = pHostInfo       @ NewConsole = false
@@ -76,8 +75,10 @@ ProcessConfig = uProcessWatch
 
 ProcessConfig = uSimMarine
 {
-  AppTick  	= 4
-  CommsTick	= 4
+  AppTick  	= 10
+  CommsTick	= 10
+
+  START_POS = $(START_POS), 180, 0
 
   start_x       = 0
   start_y       = 0

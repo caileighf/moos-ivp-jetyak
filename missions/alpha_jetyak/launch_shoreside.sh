@@ -10,6 +10,7 @@ SHORE_IP="localhost"
 SHORE_LISTEN="9200"
 BLUE_FLAG="x=-58,y=-71"
 RED_FLAG="x=50,y=-24"
+START_POS="0,0"
 
 for ARGI; do
     if [ "${ARGI}" = "--help" -o "${ARGI}" = "-h" ] ; then
