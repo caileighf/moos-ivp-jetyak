@@ -29,6 +29,8 @@ ProcessConfig = ANTLER
   Run = pHelmIvP        @ NewConsole = false
   Run = uProcessWatch	  @ NewConsole = false
   Run = pNodeReporter	  @ NewConsole = false
+  Run = pHostInfo       @ NewConsole = false
+  Run = pShare          @ Newconsole = false
 }
 
 //------------------------------------------
@@ -214,4 +216,23 @@ ProcessConfig = pNodeReporter
   platform_type   = kayak
   platform_color  = yellow
   platform_length = 4
+}
+
+//--------------------------------------------------
+ProcessConfig = pHostInfo
+{
+  AppTick     = 1
+  CommsTick   = 1
+
+//  DEFAULT_HOSTIP = localhost
+}
+
+//---------------------------------------------------------
+ProcessConfig = pShare
+{
+  AppTick    = 2
+  CommsTick  = 2
+
+  input = route =  localhost:$(SHARE_LISTEN)
+//  input = route =  multicast_7
 }

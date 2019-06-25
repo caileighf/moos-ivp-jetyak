@@ -24,6 +24,7 @@ ProcessConfig = ANTLER
   Run = MOOSDB          @ NewConsole = false
   Run = pLogger         @ NewConsole = false
   Run = pShare          @ Newconsole = false
+  Run = pHostInfo       @ NewConsole = false
 #ifdef SIM 
   Run = uSimMarine	    @ NewConsole = false
   Run = pMarineViewer   @ NewConsole = false
@@ -252,4 +253,13 @@ ProcessConfig = pShare
 
   input = route =  localhost:$(SHARE_LISTEN)
 //  input = route =  multicast_7
+}
+
+//--------------------------------------------------
+ProcessConfig = pHostInfo
+{
+  AppTick     = 2
+  CommsTick   = 2
+
+//  DEFAULT_HOSTIP = localhost
 }
