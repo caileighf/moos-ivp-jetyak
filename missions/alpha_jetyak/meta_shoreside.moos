@@ -3,10 +3,9 @@
 // FILE: alpha.moos
 //-------------------------------------------------
 
-ServerHost   = localhost
-ServerPort   = 9000
-Community    = alpha
-MOOSTimeWarp = 1
+ServerHost = localhost
+ServerPort = $(SPORT)
+Community  = $(SNAME)
 
 // Forest Lake
 LatOrigin  = 43.825300 
