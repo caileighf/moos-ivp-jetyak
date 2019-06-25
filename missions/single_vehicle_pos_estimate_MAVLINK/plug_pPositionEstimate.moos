@@ -1,0 +1,8 @@
+//------------------------------------------------------
+// pPositionEstimate Configuration Block  (Created from plugin)
+
+ProcessConfig = pPositionEstimate
+{
+  AppTick    = 1
+  CommsTick  = 1
+}
