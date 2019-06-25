@@ -125,6 +125,10 @@ bool ArduSubComms::OnStartUp()
   if(!m_MissionReader.GetConfiguration(GetAppName(), sParams))
     reportConfigWarning("No config block found for " + GetAppName());
 
+  std::string port;
+  std::string baud;
+  bool companion_comp = true;
+
   STRING_LIST::iterator p;
   for(p=sParams.begin(); p!=sParams.end(); p++) {
     string orig  = *p;
@@ -133,24 +137,37 @@ bool ArduSubComms::OnStartUp()
     string value = line;
 
     bool handled = false;
-    if(param == "FOO") {
+    if(param == "PORT") {
+      m_mavlink_port = value;
       handled = true;
     }
-    else if(param == "BAR") {
+    else if(param == "BAUD") {
+      m_mavlink_baud = value
+      handled = true;
+    }
+    else if(param == "COMPANION_COMPUTER") {
+      companion_comp = (value == "true" ? true : false);
       handled = true;
     }
 
-    if(!handled)
-      reportUnhandledConfigWarning(orig);
+    // if(!handled)
+    //   reportUnhandledConfigWarning(orig);
 
   }
 
-  if(TOGGLE_PORT){
-    m_udp_client = new UDPClient(m_io, m_mavlink_host, m_mavlink_port);
-  }else{
+  if(companion_comp){
     m_serial = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(m_io, m_mavlink_port));
     m_serial->set_option(boost::asio::serial_port_base::baud_rate(m_mavlink_baud));
+  }else{
+    m_udp_client = new UDPClient(m_io, m_mavlink_host, m_mavlink_port);
   }
+
+  // if(TOGGLE_PORT){
+  //   m_udp_client = new UDPClient(m_io, m_mavlink_host, m_mavlink_port);
+  // }else{
+  //   m_serial = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(m_io, m_mavlink_port));
+  //   m_serial->set_option(boost::asio::serial_port_base::baud_rate(m_mavlink_baud));
+  // }
 
   registerVariables();
   return(true);
