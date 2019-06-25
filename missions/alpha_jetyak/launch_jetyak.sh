@@ -12,6 +12,9 @@ VTEAM=""
 VNAME=""
 VMODEL="M300"
 
+JETYAK_IP="localhost"
+SHARE_LISTEN="9000"
+
 START_POS="0,0,180"
 RETURN_POS="5,0"
 LOITER_POS="x=100,y=-180"
@@ -31,14 +34,14 @@ for ARGI; do
     elif [ "${ARGI//[^0-9]/}" = "$ARGI" -a "$TIME_WARP" = 1 ]; then
         TIME_WARP=$ARGI
     elif [ "${ARGI}" = "--jetyak_1" -o "${ARGI}" = "-j1" ] ; then
-        JETYAK_IP=192.168.6.1 #jetyak1
+        #JETYAK_IP=192.168.6.1 #jetyak1
         VNAME="jetyak_1"
         VMODEL="jetyak"
         VPORT="9006"
         SHARE_LISTEN="9306"
         echo "JETYAK 1 vehicle selected."
     elif [ "${ARGI}" = "--jetyak_2" -o "${ARGI}" = "-j2" ] ; then
-        JETYAK_IP_IP=192.168.5.1 #jetyak2
+        #JETYAK_IP_IP=192.168.5.1 #jetyak2
         VNAME="jetyak_2"
         VMODEL="jetyak"
         VPORT="9005"
