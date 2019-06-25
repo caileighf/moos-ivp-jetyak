@@ -21,12 +21,11 @@ Processconfig = ANTLER
   Run = pShare          @ NewConsole = false
   Run = pHostInfo       @ NewConsole = false
   Run = uFldShoreBroker @ NewConsole = false
-  Run = uFldNodeBroker   @ NewConsole = false
   Run = uFldNodeComms @ NewConsole = false
 }
 
-#include plug_pShare.moos
 #include plug_uFldNodeBroker.moos
+#include plug_pShare.moos
 
 //--------------------------------------------------
 // uMAC Configuration Block
