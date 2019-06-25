@@ -30,7 +30,9 @@ ProcessConfig = ANTLER
   Run = uProcessWatch	  @ NewConsole = false
   Run = pNodeReporter	  @ NewConsole = false
   Run = pHostInfo       @ NewConsole = false
-  Run = pShare          @ Newconsole = false
+  Run = pShare          @ NewConsole = false
+  Run = uFldShoreBroker @ NewConsole = false
+  Run = uFldNodeComms   @ NewConsole = false
 }
 
 //------------------------------------------
@@ -235,4 +237,58 @@ ProcessConfig = pShare
 
   input = route =  localhost:$(SHARE_LISTEN)
 //  input = route =  multicast_7
+}
+
+//--------------------------------------------------
+// ufldnodecomms Configuration Block
+
+ProcessConfig = uFldNodeComms
+{
+  AppTick       = 2
+  CommsTick     = 2
+
+  comms_range      = 5000
+  critical_range   = 25
+
+  min_msg_interval = 0
+  max_msg_length   = 10000
+  groups           = false
+
+  view_node_rpt_pulses = false
+}
+
+
+//--------------------------------------------------
+// uFldShoreBroker Configuration Block
+ProcessConfig = uFldShoreBroker
+{
+  AppTick       = 1
+  CommsTick     = 1
+
+  // Note: [QBRIDGE = FOO]  is shorthand for
+  //       [BRIDGE = src=FOO_$V,  alias=FOO] and
+  //       [BRIDGE = src=FOO_ALL, alias=FOO]
+
+  qbridge  = DEPLOY, RETURN, STATION, NODE_REPORT, NODE_MESSAGE
+  qbridge  = MOOS_MANUAL_OVERRIDE, APPCAST_REQ, AVOID, CHASE
+  qbridge  = TAGGED
+  qbridge  = HAS_FLAG
+  qbridge  = ACTION, AGGRESSIVE, SHIELD_REQUEST
+  qbridge  = SAY_MOOS
+  qbridge  = ONFIELD, CANTAG
+
+  bridge   = src=IN_OWN_TERRITORY
+  bridge   = src=IN_ENEMY_TERRITORY
+  bridge  = src=TAGGED_VEHICLES
+  bridge   = src=UP_LOITER_$N, alias=UP_LOITER
+  bridge   = src=HELM_MAP_CLEAR, alias=HELM_MAP_CLEAR
+  bridge   = src=FLAG_SUMMARY
+  bridge   = src=MULTI_NOTIFY
+
+  qbridge = LED_TAGGED
+  qbridge = LED_HAVE_FLAG
+  qbridge = LED_IN_FLAG_ZONE
+
+  qbridge = AQUATICUS_GAME
+  qbridge = UFMG_HEARTBEAT
 }
