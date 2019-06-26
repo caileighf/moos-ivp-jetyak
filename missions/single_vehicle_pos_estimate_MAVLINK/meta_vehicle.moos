@@ -47,8 +47,8 @@ Processconfig = ANTLER
 
 ProcessConfig = pMavlinkConverter
 {
-   AppTick   = 4
-   CommsTick = 4
+   AppTick   = 10
+   CommsTick = 10
 }
 
 //------------------------------------------------
@@ -61,6 +61,6 @@ ProcessConfig = iArduSubComms
   PORT = /dev/ttyAMA0
   BAUD = 115200
 
-   AppTick   = 4
-   CommsTick = 4
+   AppTick   = 10
+   CommsTick = 10
 }

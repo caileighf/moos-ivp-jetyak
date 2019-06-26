@@ -202,7 +202,7 @@ bool ArduSubComms::buildReport()
   ACTable actab(4);
   actab << "mav_msg_TX | mav_msg_RX";
   actab.addHeaderLines();
-  actab << (int)mav_msg_tx_count << (int)mav_msg_rx_count;
+  actab << '\n' << (int)mav_msg_tx_count << (int)mav_msg_rx_count;
   m_msgs << actab.getFormattedString();
 
   return(true);
