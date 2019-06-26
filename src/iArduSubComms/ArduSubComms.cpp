@@ -116,6 +116,7 @@ bool ArduSubComms::Iterate()
   AppCastingMOOSApp::Iterate();
   // Do your thing here!
   AppCastingMOOSApp::PostReport();
+  buildReport();
   return(true);
 }
 
