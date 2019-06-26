@@ -14,7 +14,7 @@
 #define DEFAULT_REGISTER_RATE 0.0
 
 // Enable/disable debug code
-#define DEBUG 0
+#define DEBUG 1
 
 // TOGGLE_PORT 1 for Enabling Comms via UDP (for BlueROV2 control (or in SITL) from MOOS running on GCS)
 // TOGGLE_PORT 0 for Enabling Comms via SERIAL Port (for BlueROV2 control from MOOS running on companion computer onboard)
@@ -27,6 +27,9 @@ using namespace std;
 
 ArduSubComms::ArduSubComms()
 {
+  mav_msg_tx_count = 0;
+  mav_msg_rx_count = 0;
+
   if(TOGGLE_PORT){
     m_mavlink_host = "127.0.0.1";
     m_mavlink_port = "14000";
@@ -60,8 +63,12 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
 
       if(TOGGLE_PORT){
         m_udp_client->send(&m_mavlink_msg);
+
+        mav_msg_tx_count++;
       }else{
         boost::asio::write(*m_serial, boost::asio::buffer(&m_mavlink_msg, p->GetBinaryDataSize()));
+
+        mav_msg_tx_count++;
       }
 
 
@@ -188,15 +195,15 @@ void ArduSubComms::registerVariables()
 
 bool ArduSubComms::buildReport()
 {
-  // m_msgs << "============================================ \n";
-  // m_msgs << "File:                                        \n";
-  // m_msgs << "============================================ \n";
+  m_msgs << "============================================ \n";
+  m_msgs << "iArduSubComms                                \n";
+  m_msgs << "============================================ \n";
 
-  // ACTable actab(4);
-  // actab << "Alpha | Bravo | Charlie | Delta";
-  // actab.addHeaderLines();
-  // actab << "one" << "two" << "three" << "four";
-  // m_msgs << actab.getFormattedString();
+  ACTable actab(4);
+  actab << "mav_msg_TX | mav_msg_RX";
+  actab.addHeaderLines();
+  actab << (int)mav_msg_tx_count << (int)mav_msg_rx_count;
+  m_msgs << actab.getFormattedString();
 
   return(true);
 }

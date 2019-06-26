@@ -62,6 +62,9 @@ using namespace std;
 
 MavlinkConverter::MavlinkConverter()
 {
+  mav_msg_tx_count = 0;
+  mav_msg_rx_count = 0;
+
   system_id = 0;
   component_id = 0;
   time_boot_ms = 0;
@@ -185,6 +188,7 @@ bool MavlinkConverter::OnNewMail(MOOSMSG_LIST &NewMail)
 
       //send binary format to MOOSDB
       Notify("MAVLINK_MSG_SET_POSITION_TARGET",(void*)buf,len);
+      mav_msg_tx_count++;
 
       //debug of mavlink_message_t for confirmation
       /*********************************************/
@@ -206,6 +210,8 @@ bool MavlinkConverter::OnNewMail(MOOSMSG_LIST &NewMail)
 
 		float test_yaw_rate = mavlink_msg_set_position_target_local_ned_get_yaw_rate(&m_mavlink_msg);
         Notify("VERIFY_YAW_RATE",test_yaw_rate);
+
+        mav_msg_rx_count++;
       }
       /***********************************************/
     }else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
@@ -289,15 +295,15 @@ void MavlinkConverter::registerVariables()
 
 bool MavlinkConverter::buildReport() 
 {
-  // m_msgs << "============================================ \n";
-  // m_msgs << "pMavlinkConverter                                        \n";
-  // m_msgs << "============================================ \n";
+  m_msgs << "============================================ \n";
+  m_msgs << "pMavlinkConverter                                        \n";
+  m_msgs << "============================================ \n";
 
-  // ACTable actab(4);
-  // actab << "Alpha | Bravo | Charlie | Delta";
-  // actab.addHeaderLines();
-  // actab << "one" << "two" << "three" << "four";
-  // m_msgs << actab.getFormattedString();
+  ACTable actab(4);
+  actab << "mav_msg_TX | mav_msg_RX";
+  actab.addHeaderLines();
+  actab << (int)mav_msg_tx_count << (int)mav_msg_rx_count;
+  m_msgs << actab.getFormattedString();
 
   return(true);
 }

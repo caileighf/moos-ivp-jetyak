@@ -31,7 +31,8 @@ class MavlinkConverter : public AppCastingMOOSApp
    void registerVariables();
 
  private: // Configuration variables
-
+  uint64_t mav_msg_tx_count;
+  uint64_t mav_msg_rx_count;
  private: // State variables
   mavlink_message_t m_mavlink_msg;
   uint8_t system_id;
