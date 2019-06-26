@@ -1,0 +1,19 @@
+//---------------------------------------------------------
+// pShare Config Block  (Created from Plugin)
+
+ProcessConfig = pShare
+{
+  AppTick    = 10
+  CommsTick  = 10
+
+  input = route =  localhost:$(SHARE_LISTEN)
+  output = src_name = *_EST, route = localhost:9304
+  output = src_name = INTERCEPT, route = localhost:9304
+  output = src_name = TRACK, route = localhost:9304
+  output = src_name = EKF, route = localhost:9304
+  output = src_name = TGT_BRG, dest_name = COLLAB_TGT_BRG, route = localhost:9304
+  output = src_name = NAV_X, dest_name = COLLAB_X, route = localhost:9304
+  output = src_name = NAV_Y, dest_name = COLLAB_Y, route = localhost:9304
+  
+}
+

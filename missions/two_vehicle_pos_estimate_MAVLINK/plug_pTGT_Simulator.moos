@@ -1,0 +1,8 @@
+//------------------------------------------------------
+// pTGT_Simulator Configuration Block  (Created from plugin)
+
+ProcessConfig = pTGT_Simulator
+{
+  AppTick    = 1
+  CommsTick  = 1
+}
