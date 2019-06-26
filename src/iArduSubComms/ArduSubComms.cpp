@@ -116,7 +116,6 @@ bool ArduSubComms::Iterate()
   AppCastingMOOSApp::Iterate();
   // Do your thing here!
   AppCastingMOOSApp::PostReport();
-  buildReport();
   return(true);
 }
 
@@ -196,6 +195,8 @@ void ArduSubComms::registerVariables()
 
 bool ArduSubComms::buildReport()
 {
+  AppCastingMOOSApp::buildReport();
+  
   m_msgs << "============================================ \n";
   m_msgs << "iArduSubComms                                \n";
   m_msgs << "============================================ \n";
