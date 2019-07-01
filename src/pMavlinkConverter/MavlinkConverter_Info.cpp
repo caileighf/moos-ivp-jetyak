@@ -1,6 +1,6 @@
-
 /****************************************************************/
 /*   NAME: Muthukumaran Chandrasekaran and Michael Novitzky     */
+/*   Edited by: Caileigh Fitzgerald 06/2019
 /*   ORGN: MIT Cambridge MA                                     */
 /*   FILE: MavlinkConverter_Info.cpp                            */
 /*   DATE: Oct 12th 2017                                        */

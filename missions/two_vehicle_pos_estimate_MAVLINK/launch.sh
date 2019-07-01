@@ -2,9 +2,9 @@
 #-------------------------------------------------------
 #  Part 1: Check for and handle command-line arguments
 #-------------------------------------------------------
-ktm
-sleep 1
-ktm
+# ktm
+# sleep 1
+# ktm
 
 TIME_WARP=1
 JUST_MAKE="no"
@@ -51,12 +51,12 @@ LOITER_POS4="x=0,y=-200"
 SHORE_LISTEN="9300"
 
 
-nsplug jetyak1.moos targ_$VNAME1.moos -f WARP=$TIME_WARP \
+nsplug jetyak/jetyak1.moos targ_$VNAME1.moos -f WARP=$TIME_WARP \
     VNAME=$VNAME1          SHARE_LISTEN="9301"              \
     VPORT="9001"           SHORE_LISTEN=$SHORE_LISTEN       \
     START_POS=$START_POS1  
 
-nsplug jetyak2.moos targ_$VNAME2.moos -f WARP=$TIME_WARP \
+nsplug jetyak/jetyak2.moos targ_$VNAME2.moos -f WARP=$TIME_WARP \
     VNAME=$VNAME2          SHARE_LISTEN="9304"              \
     VPORT="9004"           SHORE_LISTEN=$SHORE_LISTEN       \
     START_POS=$START_POS2 
@@ -75,10 +75,10 @@ nsplug meta_shoreside.moos targ_shoreside.moos -f WARP=$TIME_WARP \
     SNAME="shoreside"  SHARE_LISTEN=$SHORE_LISTEN                 \
     SPORT="9000"       
 
-nsplug jetyak1.bhv targ_$VNAME1.bhv -f VNAME=$VNAME1     \
+nsplug jetyak/jetyak1.bhv targ_$VNAME1.bhv -f VNAME=$VNAME1     \
     START_POS=$START_POS1 LOITER_POS=$LOITER_POS1       
 
-nsplug jetyak2.bhv targ_$VNAME2.bhv -f VNAME=$VNAME2     \
+nsplug jetyak/jetyak2.bhv targ_$VNAME2.bhv -f VNAME=$VNAME2     \
     START_POS=$START_POS2 LOITER_POS=$LOITER_POS2       
 
 #nsplug jetyak3.bhv targ_$VNAME4.bhv -f VNAME=$VNAME4     \
@@ -97,11 +97,11 @@ fi
 printf "Launching $SNAME MOOS Community (WARP=%s) \n"  $TIME_WARP
 pAntler targ_shoreside.moos >& /dev/null &
 printf "Launching $VNAME1 MOOS Community (WARP=%s) \n" $TIME_WARP
-pAntler targ_$VNAME1.moos >& /dev/null &
+pAntler jetyak/targ_$VNAME1.moos >& /dev/null &
 printf "Launching $VNAME2 MOOS Community (WARP=%s) \n" $TIME_WARP
-pAntler targ_$VNAME2.moos >& /dev/null &
+pAntler jetyak/targ_$VNAME2.moos >& /dev/null &
 printf "Launching $VNAME3 MOOS Community (WARP=%s) \n" $TIME_WARP
-pAntler targ_$VNAME3.moos >& /dev/null &
+pAntler jetyak/targ_$VNAME3.moos >& /dev/null &
 printf "Done \n"
 
 uMAC targ_shoreside.moos

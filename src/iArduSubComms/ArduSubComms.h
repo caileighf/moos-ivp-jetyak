@@ -11,8 +11,8 @@
 #include "MOOS/libMOOS/Thirdparty/AppCasting/AppCastingMOOSApp.h"
 #include "mavlink.h"
 #include <iostream>
-#include <boost/array.hpp>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 
 using boost::asio::ip::udp;
 
@@ -62,19 +62,41 @@ class ArduSubComms : public AppCastingMOOSApp
 
  protected:
    void registerVariables();
+   bool isGoodSerialComms();
+   bool write(uint8_t *val, uint16_t &len);
+   bool onData(const boost::system::error_code& e, std::size_t size);
+   bool startReceive();
+   bool connectSerial(const std::string& port_name, uint16_t baud);
 
  private: // Configuration variables
    uint64_t mav_msg_tx_count;
    uint64_t mav_msg_rx_count;
+   bool     m_using_companion_comp;
+   bool     m_good_serial_comms;
  private: // State variables
-   mavlink_message_t                           m_mavlink_msg;
-   std::string                                 m_mavlink_host;
-   std::string                                 m_mavlink_port;
-   unsigned int                                m_mavlink_baud;
-   boost::asio::io_service                     m_io;
-   boost::shared_ptr<boost::asio::serial_port> m_serial;
-   boost::shared_ptr<udp::socket>              m_udp;
-   UDPClient *m_udp_client;
+   mavlink_message_t                            m_mavlink_msg;
+ 
+   // UDP comms related 
+   std::string                                  m_mavlink_host;
+   boost::shared_ptr<udp::socket>               m_udp;
+   UDPClient                                  * m_udp_client;
+ 
+   // Serial comms related 
+   std::string                                  m_mavlink_port;
+   unsigned int                                 m_mavlink_baud;
+   boost::shared_ptr<boost::asio::serial_port>  m_serial;
+   boost::asio::serial_port                     m_serial_port;
+   boost::asio::streambuf                       m_buffer; 
+
+   // common for UDP & Serial
+   boost::asio::io_service                      m_io;
+   boost::thread                                m_runner;
+   boost::shared_ptr<boost::system::error_code> m_error;
+
+   // write handler - needed for async_write calls - SERIAL COMMS
+   struct write_handler {
+      void operator()(const boost::system::error_code& ec, std::size_t bytes_transferred) {}
+   } handler;
 };
 
 #endif

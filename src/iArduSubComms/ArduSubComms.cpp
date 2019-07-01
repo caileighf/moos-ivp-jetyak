@@ -19,19 +19,23 @@
 // TOGGLE_PORT 1 for Enabling Comms via UDP (for BlueROV2 control (or in SITL) from MOOS running on GCS)
 // TOGGLE_PORT 0 for Enabling Comms via SERIAL Port (for BlueROV2 control from MOOS running on companion computer onboard)
 #define TOGGLE_PORT 0
+bool debug = true;
 
 using namespace std;
 
 //---------------------------------------------------------
 // Constructor
 
-ArduSubComms::ArduSubComms()
+ArduSubComms::ArduSubComms() : m_serial_port(m_io) 
 {
   mav_msg_tx_count = 0;
   mav_msg_rx_count = 0;
 
+  m_using_companion_comp = false;
+  m_good_serial_comms = false;
+
   if(TOGGLE_PORT){
-    m_mavlink_host = "127.0.0.1";
+    m_mavlink_host = "127.0.0.1"; // this can be updated in mission file during launch
     m_mavlink_port = "14000";
   }else{
     m_mavlink_port = "/dev/ttyAMA0";
@@ -44,6 +48,7 @@ ArduSubComms::ArduSubComms()
 
 ArduSubComms::~ArduSubComms()
 {
+  m_serial_port.close();
 }
 
 //---------------------------------------------------------
@@ -58,7 +63,8 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
     CMOOSMsg &msg = *p;
     string key    = msg.GetKey();
 
-    if(p->IsName("MAVLINK_MSG_SET_POSITION_TARGET")) {
+    if(p->IsName("MAVLINK_MSG_SET_POSITION_TARGET")) 
+    {
       memcpy((void*)&m_mavlink_msg, (void*)p->GetBinaryData(), p->GetBinaryDataSize());
 
       if(TOGGLE_PORT){
@@ -79,8 +85,9 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
       }
       /***********************************************/
 
-    }else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
-      reportRunWarning("Unhandled Mail: " + key);
+    }
+    else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
+      reportConfigWarning("Unhandled Mail: " + key);
 
     #if 0 // Keep these around just for template
       string comm  = msg.GetCommunity();
@@ -132,9 +139,7 @@ bool ArduSubComms::OnStartUp()
   if(!m_MissionReader.GetConfiguration(GetAppName(), sParams))
     reportConfigWarning("No config block found for " + GetAppName());
 
-  std::string port;
-  std::string baud;
-  bool companion_comp = true;
+  bool m_using_companion_comp = true;
 
   STRING_LIST::iterator p;
   for(p=sParams.begin(); p!=sParams.end(); p++) {
@@ -144,6 +149,7 @@ bool ArduSubComms::OnStartUp()
     string value = line;
 
     bool handled = false;
+
     if(param == "PORT") {
       m_mavlink_port = value;
       handled = true;
@@ -152,32 +158,45 @@ bool ArduSubComms::OnStartUp()
       m_mavlink_baud = atoi(value.c_str());
       handled = true;
     }
-    else if(param == "COMPANION_COMPUTER") {
-      companion_comp = (value == "true" ? true : false);
+    else if(param == "USING_COMPANION_COMPUTER") {
+      m_using_companion_comp = (value == "true" ? true : false);
       handled = true;
     }
 
-    // if(!handled)
-    //   reportUnhandledConfigWarning(orig);
+    if (!handled)
+      reportConfigWarning("Unhandled Configuration param: " + param);
 
   }
 
-  if(companion_comp){
+  if(!m_using_companion_comp)
+  {
+    connectSerial(m_mavlink_port, m_mavlink_baud);
+
     m_serial = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(m_io, m_mavlink_port));
     m_serial->set_option(boost::asio::serial_port_base::baud_rate(m_mavlink_baud));
-  }else{
+  }
+  else
+  {
     m_udp_client = new UDPClient(m_io, m_mavlink_host, m_mavlink_port);
   }
 
-  // if(TOGGLE_PORT){
-  //   m_udp_client = new UDPClient(m_io, m_mavlink_host, m_mavlink_port);
-  // }else{
-  //   m_serial = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(m_io, m_mavlink_port));
-  //   m_serial->set_option(boost::asio::serial_port_base::baud_rate(m_mavlink_baud));
-  // }
+  bool isAppCasting = buildReport();
+  if (!isAppCasting)
+    reportConfigWarning("App is NOT AppCasting!!");
 
   registerVariables();
   return(true);
+}
+
+//---------------------------------------------------------
+// Procedure: isGoodSerialComms()
+
+bool ArduSubComms::isGoodSerialComms()
+{
+  if (!m_using_companion_comp)
+    return false;
+
+  return m_serial_port.is_open();
 }
 
 //---------------------------------------------------------
@@ -200,16 +219,123 @@ bool ArduSubComms::buildReport()
   m_msgs << "============================================ \n";
   m_msgs << "iArduSubComms                                \n";
   m_msgs << "============================================ \n";
+  if (m_using_companion_comp)
+    m_msgs << " PORT: " << m_mavlink_port << " BAUD: " << m_mavlink_baud << endl;
 
-  ACTable actab(4);
+  ACTable actab(2);
   actab << "mav_msg_TX | mav_msg_RX";
   actab.addHeaderLines();
-  actab << '\n' << (int)mav_msg_tx_count << (int)mav_msg_rx_count;
+  actab << (int)mav_msg_tx_count << (int)mav_msg_rx_count;
   m_msgs << actab.getFormattedString();
 
   return(true);
 }
 
+//------------------------------------------------------------
+// Procedure: m_connect_serial()
 
+bool ArduSubComms::connectSerial(const std::string& port_name, uint16_t baud)
+{
+  if (!m_using_companion_comp)
+    return false;
 
+  using namespace boost::asio;
+
+  try {
+
+    if (debug) cout << "in try block in connectSerial()" << endl;
+
+    m_serial_port.open(port_name);
+    //Setup port
+    m_serial_port.set_option(serial_port::baud_rate(baud));
+    m_serial_port.set_option(serial_port::flow_control(serial_port::flow_control::none));
+  }
+  catch (const boost::system::system_error &e)
+  {
+    cerr << e.what() << endl;
+    cerr << e.code() << endl;
+    throw;
+  }
+
+  if (m_serial_port.is_open())
+  {
+    //Start io-service in a background thread.
+    //boost::bind binds the ioservice instance
+    //with the method call
+    m_runner = boost::thread(
+        boost::bind(
+            &boost::asio::io_service::run,
+            &m_io));
+
+    // make sure that the io_service does not return because it thinks it is out of work
+    boost::asio::io_service::work work(m_io);
+    startReceive();
+  }
+
+  return m_serial_port.is_open();
+}
+
+//------------------------------------------------------------
+// Procedure: startReceive() 
+
+bool ArduSubComms::startReceive()
+{
+  if (!m_using_companion_comp)
+    return false;
+
+  using namespace boost::asio;
+
+  if(!m_serial_port.is_open()) {
+    reportEvent("Reopening serial port");
+    m_io.reset(); //debug
+    connectSerial(m_mavlink_port, m_mavlink_baud);
+    return false;
+  }
+  // Issue an async receive and give it a callback onData that should be called when "\n" is matched, 
+  async_read_until(m_serial_port, m_buffer, '\n', boost::bind(&ArduSubComms::onData, this, _1,_2));
+  return true;
+}
+
+//------------------------------------------------------------
+// Procedure: onData() 
+
+bool ArduSubComms::onData(const boost::system::error_code& e, std::size_t size)
+{
+  if (!m_using_companion_comp)
+    return false;
+
+  if (!e) 
+  {
+    std::istream is(&m_buffer);
+    std::string data(size,'\0');
+    is.read(&data[0],size);
+
+    if(data[0] == '$') {
+      reportEvent("DEBUG CHAR RECOGNIZED data: " + data); 
+    }
+  }
+  else {
+    reportRunWarning("received error: " + e.message());
+    return false;
+  }
+  startReceive();
+  return false;
+}
+
+//------------------------------------------------------------
+// Procedure: write() 
+
+bool ArduSubComms::write(uint8_t *val, uint16_t &len)
+{
+  if (!m_using_companion_comp)
+    return false;
+
+  if (isGoodSerialComms()) {
+    boost::asio::async_write(m_serial_port, boost::asio::buffer(val, len), handler);
+    return true;
+  }
+  else
+    reportRunWarning("Bad serial comms. Last write failed!!");
+  return false;
+}
 

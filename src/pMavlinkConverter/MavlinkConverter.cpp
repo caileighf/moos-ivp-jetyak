@@ -1,5 +1,6 @@
 /*************************************************************/
 /*    NAME: Muthukumaran Chandrasekaran and Michael Novitzky */
+/*    Edited by: Caileigh Fitzgerald 06/2019    */
 /*    ORGN: MIT                                              */
 /*    FILE: MavlinkConverter.cpp                             */
 /*    DATE: Oct 12th 2017                                    */
@@ -274,6 +275,10 @@ bool MavlinkConverter::OnStartUp()
       reportUnhandledConfigWarning(orig);
 
   }
+
+  bool isAppCasting = buildReport();
+  if (!isAppCasting)
+    reportConfigWarning("App is NOT AppCasting!!");
   
   registerVariables();	
   return(true);
@@ -299,10 +304,10 @@ bool MavlinkConverter::buildReport()
   m_msgs << "pMavlinkConverter                                        \n";
   m_msgs << "============================================ \n";
 
-  ACTable actab(4);
-  actab << "mav_msg_TX | mav_msg_RX";
+  ACTable actab(2);
+  actab << "mav_msg_TX | mav_msg_RX * IF DEBUGGING ON";
   actab.addHeaderLines();
-  actab << '\n' <<(int)mav_msg_tx_count << (int)mav_msg_rx_count;
+  actab <<(int)mav_msg_tx_count << (int)mav_msg_rx_count;
   m_msgs << actab.getFormattedString();
 
   return(true);

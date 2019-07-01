@@ -3,12 +3,12 @@
 
 ProcessConfig = iArduSubComms
 {
-	COMPANION_COMPUTER = true
+	USING_COMPANION_COMPUTER = true
 
-  PORT = /dev/ttyAMA0
-  BAUD = 115200
+  	PORT = /dev/ttyAMA0
+ 	BAUD = 115200
 
-   AppTick   = 4
-   CommsTick = 4
+   	AppTick   = 4
+   	CommsTick = 4
 }
 
