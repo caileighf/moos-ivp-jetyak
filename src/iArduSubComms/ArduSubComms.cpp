@@ -295,9 +295,9 @@ bool ArduSubComms::startReceive()
   if(!m_serial_port.is_open()) {
 
     try {
-    reportEvent("Reopening serial port");
-    m_io.reset(); //debug
-    connectSerial(m_mavlink_port, m_mavlink_baud);
+      reportEvent("Reopening serial port");
+      m_io.reset(); //debug
+      connectSerial(m_mavlink_port, m_mavlink_baud);
     }
     catch (const boost::system::system_error &e)
     {
@@ -325,6 +325,9 @@ bool ArduSubComms::onData(const boost::system::error_code& e, std::size_t size)
     std::istream is(&m_buffer);
     std::string data(size,'\0');
     is.read(&data[0],size);
+
+    mav_msg_rx_count++;
+    Notify("MAV_MSG_INCOMING", data);
 
     if(data[0] == '$') {
       reportEvent("DEBUG CHAR RECOGNIZED data: " + data); 
@@ -360,7 +363,7 @@ bool ArduSubComms::write(mavlink_message_t &msg, uint16_t &len)
     return true;
   }
   else
-    reportRunWarning("Bad serial comms. Last write failed!!");
+    reportEvent("Bad serial comms. Last write failed!!");
   return false;
 }
 
@@ -385,7 +388,7 @@ bool ArduSubComms::write(uint8_t *val, uint16_t &len)
     return true;
   }
   else
-    reportRunWarning("Bad serial comms. Last write failed!!");
+    reportEvent("Bad serial comms. Last write failed!!");
   return false;
 }
 

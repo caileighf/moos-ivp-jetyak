@@ -135,6 +135,12 @@ bool MavlinkConverter::OnNewMail(MOOSMSG_LIST &NewMail)
         bool   mdbl  = msg.IsDouble();
         bool   mstr  = msg.IsString();
     #endif
+
+    if (key == "MAV_MSG_INCOMING")
+    {
+      mav_msg_rx_count++;
+      m_mav_msgs_rx.push_back(msg.GetString());
+    }
     
     if(key == "DESIRED_SPEED") { // check for incoming target speed 
       if(mdbl>=0){
@@ -211,7 +217,6 @@ bool MavlinkConverter::OnNewMail(MOOSMSG_LIST &NewMail)
 		float test_yaw_rate = mavlink_msg_set_position_target_local_ned_get_yaw_rate(&m_mavlink_msg);
         Notify("VERIFY_YAW_RATE",test_yaw_rate);
 
-        mav_msg_rx_count++;
       }
       /***********************************************/
     }else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
@@ -291,6 +296,7 @@ void MavlinkConverter::registerVariables()
   AppCastingMOOSApp::RegisterVariables();
   Register("DESIRED_SPEED",DEFAULT_REGISTER_RATE);
   Register("DESIRED_HEADING",DEFAULT_REGISTER_RATE);
+  Register("MAV_MSG_INCOMING",DEFAULT_REGISTER_RATE);
 }
 
 
@@ -303,10 +309,10 @@ bool MavlinkConverter::buildReport()
   m_msgs << "pMavlinkConverter                                        \n";
   m_msgs << "============================================ \n";
 
-  ACTable actab(2);
-  actab << "mav_msg_TX | mav_msg_RX * IF DEBUGGING ON";
+  ACTable actab(3);
+  actab << "mav_msg_TX | mav_msg_RX | last msg rx";
   actab.addHeaderLines();
-  actab <<(int)mav_msg_tx_count << (int)mav_msg_rx_count;
+  actab <<(int)mav_msg_tx_count << (int)mav_msg_rx_count << m_mav_msgs_rx.back();
   m_msgs << actab.getFormattedString();
 
   return(true);

@@ -11,6 +11,7 @@
 
 #include "MOOS/libMOOS/Thirdparty/AppCasting/AppCastingMOOSApp.h"
 #include "mavlink.h"
+#include <vector>
 // #include "mavlink_msg_set_position_target_global_int.h"
 
 class MavlinkConverter : public AppCastingMOOSApp
@@ -35,6 +36,7 @@ class MavlinkConverter : public AppCastingMOOSApp
   uint64_t mav_msg_tx_count;
   uint64_t mav_msg_rx_count;
  private: // State variables
+  std::vector<std::string> m_mav_msgs_rx;
   mavlink_message_t m_mavlink_msg;
   uint8_t system_id;
   uint8_t component_id;
