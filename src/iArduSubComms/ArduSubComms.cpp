@@ -28,6 +28,8 @@ using namespace std;
 
 ArduSubComms::ArduSubComms() : m_serial_port(m_io) 
 {
+  if (debug) cout << "In ArduSubComms Constructor!" << endl;
+
   mav_msg_tx_count = 0;
   mav_msg_rx_count = 0;
 
@@ -67,14 +69,16 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
     {
       memcpy((void*)&m_mavlink_msg, (void*)p->GetBinaryData(), p->GetBinaryDataSize());
 
-      if(TOGGLE_PORT){
+      if(!m_using_companion_comp){
         m_udp_client->send(&m_mavlink_msg);
 
         mav_msg_tx_count++;
       }else{
-        boost::asio::write(*m_serial, boost::asio::buffer(&m_mavlink_msg, p->GetBinaryDataSize()));
+        uint16_t len = p->GetBinaryDataSize();
+        // write to the serial port
+        bool sucessful_write = write(m_mavlink_msg, len);
 
-        mav_msg_tx_count++;
+        if (sucessful_write) mav_msg_tx_count++;
       }
 
 
@@ -139,8 +143,6 @@ bool ArduSubComms::OnStartUp()
   if(!m_MissionReader.GetConfiguration(GetAppName(), sParams))
     reportConfigWarning("No config block found for " + GetAppName());
 
-  bool m_using_companion_comp = true;
-
   STRING_LIST::iterator p;
   for(p=sParams.begin(); p!=sParams.end(); p++) {
     string orig  = *p;
@@ -162,18 +164,22 @@ bool ArduSubComms::OnStartUp()
       m_using_companion_comp = (value == "true" ? true : false);
       handled = true;
     }
+    else if (param == "APPTICK" || param == "COMMSTICK")
+      handled = true; 
 
     if (!handled)
       reportConfigWarning("Unhandled Configuration param: " + param);
 
   }
 
-  if(!m_using_companion_comp)
+  if(m_using_companion_comp) // if using companion computer then connect via hardware serial
   {
-    connectSerial(m_mavlink_port, m_mavlink_baud);
+    if (debug) cout << "inside block to open up hardware serial port!" << endl;
+    m_good_serial_comms = connectSerial(m_mavlink_port, m_mavlink_baud);
+    if (debug) cout << "serial " << (m_good_serial_comms ? "HAS" : "HAS NOT") << " connected" << endl;
 
-    m_serial = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(m_io, m_mavlink_port));
-    m_serial->set_option(boost::asio::serial_port_base::baud_rate(m_mavlink_baud));
+    //m_serial = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(m_io, m_mavlink_port));
+    //m_serial->set_option(boost::asio::serial_port_base::baud_rate(m_mavlink_baud));
   }
   else
   {
@@ -219,8 +225,10 @@ bool ArduSubComms::buildReport()
   m_msgs << "============================================ \n";
   m_msgs << "iArduSubComms                                \n";
   m_msgs << "============================================ \n";
-  if (m_using_companion_comp)
+  if (m_using_companion_comp) {
     m_msgs << " PORT: " << m_mavlink_port << " BAUD: " << m_mavlink_baud << endl;
+    m_msgs << "\tserial port " << (m_good_serial_comms ? "is" : "is NOT") << " open" << endl;
+  }
 
   ACTable actab(2);
   actab << "mav_msg_TX | mav_msg_RX";
@@ -241,31 +249,30 @@ bool ArduSubComms::connectSerial(const std::string& port_name, uint16_t baud)
 
   using namespace boost::asio;
 
-  try {
+  if (!m_serial_port.is_open()) { // if port isn't open try to open
+    try {
 
-    if (debug) cout << "in try block in connectSerial()" << endl;
+      if (debug) cout << "in try block in connectSerial()" << endl;
 
-    m_serial_port.open(port_name);
-    //Setup port
-    m_serial_port.set_option(serial_port::baud_rate(baud));
-    m_serial_port.set_option(serial_port::flow_control(serial_port::flow_control::none));
-  }
-  catch (const boost::system::system_error &e)
-  {
-    cerr << e.what() << endl;
-    cerr << e.code() << endl;
-    throw;
-  }
+      m_serial_port.open(port_name);
+      //Setup port
+      m_serial_port.set_option(serial_port::baud_rate(baud));
+      m_serial_port.set_option(serial_port::flow_control(serial_port::flow_control::none));
+    }
+    catch (const boost::system::system_error &e)
+    {
+      cerr << e.what() << endl;
+      cerr << e.code() << endl;
+      return false;
+    }
+  } // end if port not open
 
   if (m_serial_port.is_open())
   {
     //Start io-service in a background thread.
     //boost::bind binds the ioservice instance
     //with the method call
-    m_runner = boost::thread(
-        boost::bind(
-            &boost::asio::io_service::run,
-            &m_io));
+    m_runner = boost::thread(boost::bind(&boost::asio::io_service::run, &m_io));
 
     // make sure that the io_service does not return because it thinks it is out of work
     boost::asio::io_service::work work(m_io);
@@ -286,9 +293,18 @@ bool ArduSubComms::startReceive()
   using namespace boost::asio;
 
   if(!m_serial_port.is_open()) {
+
+    try {
     reportEvent("Reopening serial port");
     m_io.reset(); //debug
     connectSerial(m_mavlink_port, m_mavlink_baud);
+    }
+    catch (const boost::system::system_error &e)
+    {
+      cerr << e.what() << endl;
+      cerr << e.code() << endl;
+      return false;
+    }
     return false;
   }
   // Issue an async receive and give it a callback onData that should be called when "\n" is matched, 
@@ -325,13 +341,47 @@ bool ArduSubComms::onData(const boost::system::error_code& e, std::size_t size)
 //------------------------------------------------------------
 // Procedure: write() 
 
+bool ArduSubComms::write(mavlink_message_t &msg, uint16_t &len)
+{
+  if (!m_using_companion_comp)
+    return false;
+
+  if (isGoodSerialComms()) {
+    try {
+    
+      boost::asio::async_write(m_serial_port, boost::asio::buffer(&msg, len), handler);
+    }
+    catch (const boost::system::system_error &e)
+    {
+      cerr << e.what() << endl;
+      cerr << e.code() << endl;
+      return false;
+    }
+    return true;
+  }
+  else
+    reportRunWarning("Bad serial comms. Last write failed!!");
+  return false;
+}
+
+//------------------------------------------------------------
+// Procedure: write() 
+
 bool ArduSubComms::write(uint8_t *val, uint16_t &len)
 {
   if (!m_using_companion_comp)
     return false;
 
   if (isGoodSerialComms()) {
-    boost::asio::async_write(m_serial_port, boost::asio::buffer(val, len), handler);
+    try {
+      boost::asio::async_write(m_serial_port, boost::asio::buffer(val, len), handler);
+    }
+    catch (const boost::system::system_error &e)
+    {
+      cerr << e.what() << endl;
+      cerr << e.code() << endl;
+      return false;
+    }
     return true;
   }
   else

@@ -43,7 +43,11 @@ int main(int argc, char *argv[])
   cout << "iArduSubComms launching as " << run_command << endl;
   cout << termColor() << endl;
 
+  cout << "I\'m about to create a ArduSubComms object!" << endl;
+
   ArduSubComms ArduSubComms;
+
+  cout << "I\'m about to launch thread for ArduSubComms!" << endl;
 
   ArduSubComms.Run(run_command.c_str(), mission_file.c_str());
   

@@ -64,6 +64,7 @@ class ArduSubComms : public AppCastingMOOSApp
    void registerVariables();
    bool isGoodSerialComms();
    bool write(uint8_t *val, uint16_t &len);
+   bool write(mavlink_message_t &msg, uint16_t &len);
    bool onData(const boost::system::error_code& e, std::size_t size);
    bool startReceive();
    bool connectSerial(const std::string& port_name, uint16_t baud);
@@ -76,6 +77,11 @@ class ArduSubComms : public AppCastingMOOSApp
  private: // State variables
    mavlink_message_t                            m_mavlink_msg;
  
+   // common for UDP & Serial
+   boost::asio::io_service                      m_io;
+   boost::thread                                m_runner;
+   boost::shared_ptr<boost::system::error_code> m_error;
+
    // UDP comms related 
    std::string                                  m_mavlink_host;
    boost::shared_ptr<udp::socket>               m_udp;
@@ -86,12 +92,7 @@ class ArduSubComms : public AppCastingMOOSApp
    unsigned int                                 m_mavlink_baud;
    boost::shared_ptr<boost::asio::serial_port>  m_serial;
    boost::asio::serial_port                     m_serial_port;
-   boost::asio::streambuf                       m_buffer; 
-
-   // common for UDP & Serial
-   boost::asio::io_service                      m_io;
-   boost::thread                                m_runner;
-   boost::shared_ptr<boost::system::error_code> m_error;
+   boost::asio::streambuf                       m_buffer; // for data coming IN
 
    // write handler - needed for async_write calls - SERIAL COMMS
    struct write_handler {

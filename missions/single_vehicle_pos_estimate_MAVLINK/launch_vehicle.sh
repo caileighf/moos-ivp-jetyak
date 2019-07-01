@@ -39,7 +39,7 @@ nsplug meta_vehicle.moos targ_$VNAME.moos -f WARP=$TIME_WARP \
     VPORT="9001"           SHORE_LISTEN=$SHORE_LISTEN       \
     START_POS=$START_POS  SHORE_IP=$SHORE_IP 
 
-nsplug meta_vehicle.bhv targ_$VNAME1.bhv -f VNAME=$VNAME     \
+nsplug meta_vehicle.bhv targ_$VNAME.bhv -f VNAME=$VNAME     \
     START_POS=$START_POS LOITER_POS=$LOITER_POS    
 
 if [ ${JUST_MAKE} = "yes" ] ; then

@@ -166,9 +166,8 @@ bool MavlinkConverter::OnNewMail(MOOSMSG_LIST &NewMail)
 	  //vy = 0.0f;
       //vx = (float) m_desired_speed;
       yaw = (float) m_desired_heading_rad;
-	  yaw_rate = 0.2618;
+	    yaw_rate = 0.2618;
       
-
       system_id = SYSTEM_ID;
       component_id = COMPONENT_ID;
       target_system = TARGET_SYSTEM;
