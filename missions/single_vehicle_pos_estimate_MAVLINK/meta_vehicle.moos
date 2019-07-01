@@ -26,7 +26,7 @@ Processconfig = ANTLER
   Run = pGenerateBRG        @ NewConsole = false
   Run = pPositionEstimate   @ NewConsole = false
   Run = pMavlinkConverter @ Newconsole = false
-//  Run = iArduSubComms @ Newconsole = false
+  Run = iArduSubComms @ Newconsole = false
 }
 
 #include plug_uFldNodeBroker.moos
@@ -58,7 +58,7 @@ ProcessConfig = iArduSubComms
 {
   USING_COMPANION_COMPUTER = true
 
-  PORT = /dev/urandom
+  PORT = /dev/ttyAMA0
   BAUD = 115200
 
    AppTick   = 10
