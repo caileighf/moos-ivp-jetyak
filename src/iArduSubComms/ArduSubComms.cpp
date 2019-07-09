@@ -9,9 +9,32 @@
 #include "MBUtils.h"
 #include "ACTable.h"
 #include "ArduSubComms.h"
+#include "time.h"
+#include "sys/time.h"
 
 // Max rate to receive MOOS updates (0 indicates no rate, get all)
 #define DEFAULT_REGISTER_RATE 0.0
+#define SYSTEM_ID 255
+#define COMPONENT_ID 0
+#define TARGET_SYSTEM 1
+#define TARGET_COMPONENT 1
+#define COORDINATE_FRAME 1
+/*
+ ROV mode mapping
+ mavlink_msg_set_mode_pack(system_id,component_id,&m_mavlink_msg,target_system,1,XX)
+ XX is:
+ 0: 'STABILIZE',
+ 1: 'ACRO',
+ 2: 'ALT_HOLD',
+ 3: 'AUTO',
+ 4: 'GUIDED',
+ 7: 'CIRCLE',
+ 9: 'SURFACE',
+ 16: 'POSHOLD',
+ 19: 'MANUAL',
+ 
+ autopilot.mav.command_long_send(1,1,176,0,2,0,0,0,0,0,0)  ALT HOLD
+*/
 
 // Enable/disable debug code
 #define DEBUG 1
@@ -23,6 +46,17 @@ bool debug = true;
 
 using namespace std;
 
+// ----------------------------------------------------------------------------------
+//   Time
+// ------------------- ---------------------------------------------------------------
+uint64_t
+get_time_usec()
+{
+  static struct timeval _time_stamp;
+  gettimeofday(&_time_stamp, NULL);
+  return _time_stamp.tv_sec*1000000 + _time_stamp.tv_usec;
+}
+
 //---------------------------------------------------------
 // Constructor
 
@@ -33,8 +67,16 @@ ArduSubComms::ArduSubComms() : m_serial_port(m_io)
   mav_msg_tx_count = 0;
   mav_msg_rx_count = 0;
 
+  m_fcu_has_gps_fix = false; // MUST have GPS fix before we can deploy
   m_using_companion_comp = false;
   m_good_serial_comms = false;
+
+  system_id = SYSTEM_ID;
+  component_id = COMPONENT_ID;
+  target_system = TARGET_SYSTEM;
+  target_component = TARGET_COMPONENT;
+  coordinate_frame = COORDINATE_FRAME;
+  type_mask = 3576;
 
   if(TOGGLE_PORT){
     m_mavlink_host = "127.0.0.1"; // this can be updated in mission file during launch
@@ -64,6 +106,7 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
   for(p=NewMail.begin(); p!=NewMail.end(); p++) {
     CMOOSMsg &msg = *p;
     string key    = msg.GetKey();
+    string sval   = msg.GetString();
 
     if(p->IsName("MAVLINK_MSG_SET_POSITION_TARGET")) 
     {
@@ -81,7 +124,7 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
         if (sucessful_write) mav_msg_tx_count++;
       }
 
-
+      Notify("ARDUSUB_COMMS_ACK", "received");
       //debug of mavlink_message_t for confirmation
       /*********************************************/
       if (DEBUG){
@@ -90,8 +133,73 @@ bool ArduSubComms::OnNewMail(MOOSMSG_LIST &NewMail)
       /***********************************************/
 
     }
-    else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
-      reportConfigWarning("Unhandled Mail: " + key);
+    // Arming and disarming
+    if(key == "ROV_STATE") {
+        uint16_t len = p->GetBinaryDataSize();
+        if(sval=="ARM"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length1 = mavlink_msg_command_long_pack(system_id,component_id,&m_mavlink_msg,1,1,400,0,1,0,0,0,0,0,0);
+            unsigned len1 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+        else if(sval=="DISARM"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length2 = mavlink_msg_command_long_pack(system_id,component_id,&m_mavlink_msg,1,1,400,0,0,0,0,0,0,0,0);
+            unsigned len2 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+    }
+    
+    // Flight mode setting
+    if(key == "ROV_MODE") {
+      uint16_t len = p->GetBinaryDataSize();
+        if(sval=="STABILIZE"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length1 = mavlink_msg_set_mode_pack(system_id,component_id,&m_mavlink_msg,target_system,1,0);
+            unsigned len1 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+        else if(sval=="MANUAL"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length1 = mavlink_msg_set_mode_pack(system_id,component_id,&m_mavlink_msg,target_system,1,19);
+            unsigned len1 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+        else if(sval=="DEPTHHOLD"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length1 = mavlink_msg_set_mode_pack(system_id,component_id,&m_mavlink_msg,target_system,1,2);
+            unsigned len1 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+        else if(sval=="GUIDED"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length1 = mavlink_msg_set_mode_pack(system_id,component_id,&m_mavlink_msg,target_system,1,4);
+            unsigned len1 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+        else if(sval=="SURFACE"){
+            time_boot_ms = (uint32_t) (get_time_usec()/1000);
+            char buf[300];
+            uint16_t length1 = mavlink_msg_set_mode_pack(system_id,component_id,&m_mavlink_msg,target_system,1,9);
+            unsigned len1 = mavlink_msg_to_send_buffer((uint8_t*)buf, &m_mavlink_msg);
+            if(!m_using_companion_comp) m_udp_client->send(&m_mavlink_msg);
+            else bool sucessful_write = write(m_mavlink_msg, len);
+        }
+    }
+    // else if(key != "APPCAST_REQ") // handled by AppCastingMOOSApp
+    //   reportConfigWarning("Unhandled Mail: " + key);
 
     #if 0 // Keep these around just for template
       string comm  = msg.GetCommunity();
@@ -212,6 +320,8 @@ void ArduSubComms::registerVariables()
 {
   AppCastingMOOSApp::RegisterVariables();
   Register("MAVLINK_MSG_SET_POSITION_TARGET", DEFAULT_REGISTER_RATE);
+  Register("ROV_STATE", DEFAULT_REGISTER_RATE);
+  Register("ROV_MODE", DEFAULT_REGISTER_RATE);
 }
 
 

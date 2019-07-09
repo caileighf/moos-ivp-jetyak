@@ -65,6 +65,7 @@ MavlinkConverter::MavlinkConverter()
 {
   mav_msg_tx_count = 0;
   mav_msg_rx_count = 0;
+  m_ardusub_comms_ack = 0;
 
   system_id = 0;
   component_id = 0;
@@ -140,6 +141,11 @@ bool MavlinkConverter::OnNewMail(MOOSMSG_LIST &NewMail)
     {
       mav_msg_rx_count++;
       m_mav_msgs_rx.push_back(msg.GetString());
+    }
+
+    if (key == "ARDUSUB_COMMS_ACK")
+    {
+      m_ardusub_comms_ack++;
     }
     
     if(key == "DESIRED_SPEED") { // check for incoming target speed 
@@ -297,6 +303,7 @@ void MavlinkConverter::registerVariables()
   Register("DESIRED_SPEED",DEFAULT_REGISTER_RATE);
   Register("DESIRED_HEADING",DEFAULT_REGISTER_RATE);
   Register("MAV_MSG_INCOMING",DEFAULT_REGISTER_RATE);
+  Register("ARDUSUB_COMMS_ACK",DEFAULT_REGISTER_RATE);
 }
 
 
@@ -310,14 +317,14 @@ bool MavlinkConverter::buildReport()
   m_msgs << "============================================ \n";
 
   ACTable actab(3);
-  actab << "mav_msg_TX | mav_msg_RX | last msg rx";
+  actab << "mav_msg_TX | mav_msg_RX | ARDUSUB_COMMS_ACK";
   actab.addHeaderLines();
-  actab <<(int)mav_msg_tx_count << (int)mav_msg_rx_count << m_mav_msgs_rx.back();
+  actab <<(int)mav_msg_tx_count << (int)mav_msg_rx_count << (int)m_ardusub_comms_ack;
+
+  m_msgs << endl << "last msg rx: " << (m_mav_msgs_rx.empty() ? m_mav_msgs_rx.back() : "no msgs received yet");
   m_msgs << actab.getFormattedString();
 
   return(true);
 }
-
-
 
 

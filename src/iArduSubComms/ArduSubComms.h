@@ -74,6 +74,15 @@ class ArduSubComms : public AppCastingMOOSApp
    uint64_t mav_msg_rx_count;
    bool     m_using_companion_comp;
    bool     m_good_serial_comms;
+   bool     m_fcu_has_gps_fix;
+
+   uint16_t system_id;
+   uint16_t component_id;
+   uint16_t target_system;
+   uint16_t target_component;
+   uint16_t coordinate_frame;
+   uint16_t type_mask;
+   uint32_t time_boot_ms;
  private: // State variables
    mavlink_message_t                            m_mavlink_msg;
  

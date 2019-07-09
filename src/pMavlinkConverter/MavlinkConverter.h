@@ -35,6 +35,7 @@ class MavlinkConverter : public AppCastingMOOSApp
  private: // Configuration variables
   uint64_t mav_msg_tx_count;
   uint64_t mav_msg_rx_count;
+  uint64_t m_ardusub_comms_ack;
  private: // State variables
   std::vector<std::string> m_mav_msgs_rx;
   mavlink_message_t m_mavlink_msg;
