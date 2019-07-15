@@ -1,0 +1,42 @@
+/etc/network/interfaces file for raspberry pi to work with static IP on UBNT network
+pulled from raspi on jetyak bottle 02 with static IP 192.168.1.12
+
+* If the raspi is setup correctly, it won't show up in the router list of devices (when logining in via a web browser)
+
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# dynamic address - uncomment for ethernet internet access
+#auto enxb827eb8104f9
+#iface enxb827eb8104f9 inet dhcp
+
+# static address - uncomment to interface with SandShark tailcone
+auto enxb827eb889b9e
+iface enxb827eb889b9e inet static
+    address 192.168.1.12
+    netmask 255.255.255.0
+    gateway 192.168.1.13
+
+
+# # interfaces(5) file used by ifup(8) and ifdown(8)
+# # Include files from /etc/network/interfaces.d:
+# source-directory /etc/network/interfaces.d
+
+# # The loopback network interface
+# auto lo
+# iface lo inet loopback
+
+# # dynamic address - uncomment for ethernet internet access
+# #auto enxb827eb8104f9
+# #iface enxb827eb8104f9 inet dhcp
+
+# # static address - uncomment to interface with SandShark tailcone
+# auto enxb827eb8104f9
+# iface enxb827eb8104f9 inet static
+#     address 10.0.7.66
+#     netmask 255.255.255.0
