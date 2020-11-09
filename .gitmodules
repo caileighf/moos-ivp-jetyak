@@ -1,0 +1,6 @@
+[submodule "src/pMavlink"]
+	path = src/pMavlink
+	url = https://github.com/mission-systems-pty-ltd/pMavlink.git
+[submodule "src/iPX4"]
+	path = src/iPX4
+	url = https://github.com/mission-systems-pty-ltd/iPX4
