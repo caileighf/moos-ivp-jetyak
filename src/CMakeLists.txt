@@ -14,8 +14,9 @@ INCLUDE_DIRECTORIES(${LOCAL_LIBRARY_DIRS})
 #============================================================================
 # List the subdirectories to build...
 #============================================================================
-ADD_SUBDIRECTORY(pMavlinkConverter)
-ADD_SUBDIRECTORY(iArduSubComms)
+# ADD_SUBDIRECTORY(pMavlinkConverter)
+# ADD_SUBDIRECTORY(iArduSubComms)
+ADD_SUBDIRECTORY(pSetPointFeeder)
 
 ##############################################################################
 #                           END of CMakeLists.txt
