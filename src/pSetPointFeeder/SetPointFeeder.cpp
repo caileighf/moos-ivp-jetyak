@@ -169,14 +169,13 @@ bool SetPointFeeder::buildReport()
   ACTable actab(4);
   actab << "x | y | z | yaw";
   actab.addHeaderLines(); 
-  actab << "x" << "y" << "z" << "yaw" << endl;
+  actab << "x" << "y" << "z" << "yaw";
   m_msgs << actab.getFormattedString();
 
   ACTable actab_bottom(2);
   actab_bottom << "Desired Speed | Desired Heading";
   actab_bottom.addHeaderLines();
-  if (!mDesiredSpeed.empty() and !mDesiredHeading.empty())
-    actab_bottom << mDesiredSpeed.back() << mDesiredHeading.back() << endl;
+  if (!mDesiredSpeed.empty() and !mDesiredHeading.empty());
   m_msgs << actab_bottom.getFormattedString();
 
   return(true);
