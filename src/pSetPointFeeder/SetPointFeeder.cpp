@@ -1,7 +1,7 @@
 /************************************************************/
-/*    NAME: Caileigh Fitzgerald                                              */
+/*    NAME: Caileigh Fitzgerald                             */
 /*    ORGN: MIT                                             */
-/*    FILE: SetPointFeeder.cpp                                        */
+/*    FILE: SetPointFeeder.cpp                              */
 /*    DATE:                                                 */
 /************************************************************/
 
@@ -22,6 +22,7 @@ SetPointFeeder::SetPointFeeder()
   mValidZDelta   = 0.0;
   mValidYawDelta = 0.0;
 
+  mIsOffBoardMode = false;
   // mDesiredSpeed;
   // mDesiredHeading;
   mNavMsgs.push_back(NAV_MSG());
@@ -67,6 +68,14 @@ bool SetPointFeeder::OnNewMail(MOOSMSG_LIST &NewMail)
 }
 
 //---------------------------------------------------------
+// Procedure: sendNullSetPoint
+
+void SetPointFeeder::sendNullSetPoint()
+{
+  Notify("DESIRED_SETPOINT", "{\"x\":5.0,\"y\":0.0,\"z\":50.0,\"yaw\":0.0}");
+}
+
+//---------------------------------------------------------
 // Procedure: OnConnectToServer
 
 bool SetPointFeeder::OnConnectToServer()
@@ -82,7 +91,19 @@ bool SetPointFeeder::OnConnectToServer()
 bool SetPointFeeder::Iterate()
 {
   AppCastingMOOSApp::Iterate();
-  // Do your thing here!
+  
+  if (mIsOffBoardMode)
+  {
+
+  }
+  else 
+  {
+    // sends zeroed out setpoint.
+    // intended to send setpoint messages at apptick
+    // .. until we are in "Off Board mode" then we send real data
+    sendNullSetPoint(); 
+  }
+
   AppCastingMOOSApp::PostReport();
   return(true);
 }
@@ -107,11 +128,8 @@ bool SetPointFeeder::OnStartUp()
     string param = toupper(biteStringX(line, '='));
     string value = line;
 
-    bool handled = false;
+    bool handled = true;
     if(param == "FOO") {
-      handled = true;
-    }
-    else if(param == "BAR") {
       handled = true;
     }
 
@@ -145,14 +163,21 @@ void SetPointFeeder::registerVariables()
 bool SetPointFeeder::buildReport() 
 {
   m_msgs << "============================================ \n";
-  m_msgs << "File:                                        \n";
+  m_msgs << " pSetPointFeeder                             \n";
   m_msgs << "============================================ \n";
 
   ACTable actab(4);
-  actab << "Alpha | Bravo | Charlie | Delta";
-  actab.addHeaderLines();
-  actab << "one" << "two" << "three" << "four";
+  actab << "x | y | z | yaw";
+  actab.addHeaderLines(); 
+  actab << "x" << "y" << "z" << "yaw" << endl;
   m_msgs << actab.getFormattedString();
+
+  ACTable actab_bottom(2);
+  actab_bottom << "Desired Speed | Desired Heading";
+  actab_bottom.addHeaderLines();
+  if (!mDesiredSpeed.empty() and !mDesiredHeading.empty())
+    actab_bottom << mDesiredSpeed.back() << mDesiredHeading.back() << endl;
+  m_msgs << actab_bottom.getFormattedString();
 
   return(true);
 }

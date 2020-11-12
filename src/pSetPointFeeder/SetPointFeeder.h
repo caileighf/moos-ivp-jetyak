@@ -49,6 +49,7 @@ class SetPointFeeder : public AppCastingMOOSApp
 
  protected:
    void registerVariables();
+   void sendNullSetPoint();
 
  private: // Configuration variables
 
@@ -57,7 +58,8 @@ class SetPointFeeder : public AppCastingMOOSApp
     double   mValidYDelta;
     double   mValidZDelta;
     double   mValidYawDelta;
-
+    bool     mIsOffBoardMode;
+    
     std::vector<double>   mDesiredSpeed;
     std::vector<double>   mDesiredHeading;
     std::vector<NAV_MSG>    mNavMsgs;

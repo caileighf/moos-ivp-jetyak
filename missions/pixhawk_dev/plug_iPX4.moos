@@ -1,0 +1,10 @@
+//------------------------------------------------
+// iPX4 config block
+
+ProcessConfig = iPX4
+{
+ 	UDP_MODE    = FALSE 
+    SERIAL_NAME = /dev/ttyUSB0
+	SERIAL_BAUD = 921600 // 57600
+}
+
