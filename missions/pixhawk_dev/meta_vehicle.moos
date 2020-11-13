@@ -1,0 +1,54 @@
+/-------------------------------------------------
+// NAME: Caileigh Fitzgerald -- WHOI
+// FILE: meta_jetyak.moos
+//-------------------------------------------------
+
+ServerHost = localhost
+ServerPort = $(VPORT)
+Community  = $(VNAME)
+
+#include plug_origin_warp.moos
+
+//------------------------------------------
+// Antler configuration  block
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 200
+
+  Run = MOOSDB          @ NewConsole = false
+  Run = uProcessWatch   @ NewConsole = false
+  Run = pHostInfo       @ NewConsole = false
+  Run = pShare          @ NewConsole = false
+  Run = pMarinePID      @ NewConsole = false
+  Run = pLogger         @ NewConsole = false
+  Run = pNodeReporter	  @ NewConsole = false
+  Run = pHelmIvP        @ NewConsole = false
+
+  Run = pSetPointFeeder @ NewConsole = false
+  Run = iPX4            @ NewConsole = false
+  Run = pMavlink        @ NewConsole = false
+}
+
+//------------------------------------------
+// uProcessWatch
+
+ProcessConfig = uProcessWatch
+{
+  AppTick   = 4
+  CommsTick = 4
+
+  watch_all = true
+	nowatch   = uPokeDB*
+	nowatch   = uXMS*
+}
+
+#include plug_pSetPointFeeder.moos
+#include plug_iPX4.moos
+#include plug_pMavlink.moos
+
+#include plug_pHostInfo.moos
+#include plug_pShare.moos
+#include plug_pMarinePID.moos
+#include plug_pLogger.moos
+#include plug_pNodeReporter.moos
+#include plug_pHelmIvP.moos

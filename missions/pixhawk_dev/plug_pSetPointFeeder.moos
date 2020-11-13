@@ -1,0 +1,9 @@
+//------------------------------------------------
+// pSetPointFeeder config block
+
+ProcessConfig = pSetPointFeeder
+{
+   AppTick   = 4
+   CommsTick = 4
+}
+

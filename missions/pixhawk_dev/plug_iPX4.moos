@@ -5,6 +5,6 @@ ProcessConfig = iPX4
 {
  	UDP_MODE    = FALSE 
     SERIAL_NAME = /dev/ttyUSB0
-	SERIAL_BAUD = 921600 // 57600
+	SERIAL_BAUD = 57600
 }
 

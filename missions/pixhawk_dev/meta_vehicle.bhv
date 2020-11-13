@@ -1,0 +1,41 @@
+//--------    FILE: meta_jetyak.moos.bhv   -------------
+
+initialize   DEPLOY = false
+initialize   RETURN = false
+	
+Behavior = BHV_ConstantHeading
+{
+ // General Behavior Parameters
+ // ---------------------------
+ name         = const_hdg            // example
+ pwt          = 100                  // default
+ condition    = MODE==GO_STRAIGHT    // example
+ updates      = CONST_HDG_UPDATES    // example
+
+ // Parameters specific to this behavior
+ // ------------------------------------
+            basewidth = 10           // default
+             duration = 0            // default
+                speed = 0            // default
+ heading_mismatch_var = HDG_DIFF     // example
+            peakwidth = 10           // default
+          summitdelta = 25           // default
+}
+
+//----------------------------------------------
+Behavior = BHV_ConstantSpeed
+{
+  name       = const_speed
+  pwt        = 200
+  condition  = SPD=true
+  condition  = DEPLOY = true
+  perpetual  = true
+  updates    = SPEED_UPDATE
+  endflag    = SPD = false
+
+       	 speed = 0.5
+      duration = 10
+duration_reset = CONST_SPD_RESET=true
+	
+}
+
