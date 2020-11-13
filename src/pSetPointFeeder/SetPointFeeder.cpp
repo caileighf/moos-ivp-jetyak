@@ -72,7 +72,7 @@ bool SetPointFeeder::OnNewMail(MOOSMSG_LIST &NewMail)
 
 void SetPointFeeder::sendNullSetPoint()
 {
-  Notify("DESIRED_SETPOINT", "{\"x\":5.0,\"y\":0.0,\"z\":50.0,\"yaw\":0.0}");
+  Notify("DESIRED_SETPOINT", "{\"x\":3.0,\"y\":3.0,\"z\":3.0,\"yaw\":0.0}");
 }
 
 //---------------------------------------------------------

@@ -24,6 +24,9 @@ ProcessConfig = ANTLER
   Run = pNodeReporter	  @ NewConsole = false
   Run = pHelmIvP        @ NewConsole = false
 
+  Run = uFldNodeBroker     @ NewConsole = false
+  Run = uFldMessageHandler @ NewConsole = false
+
   Run = pSetPointFeeder @ NewConsole = false
   Run = iPX4            @ NewConsole = false
   Run = pMavlink        @ NewConsole = false
@@ -52,3 +55,5 @@ ProcessConfig = uProcessWatch
 #include plug_pLogger.moos
 #include plug_pNodeReporter.moos
 #include plug_pHelmIvP.moos
+#include plug_uFldNodeBroker.moos
+#include plug_uFldMessageHandler.moos
