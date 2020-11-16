@@ -4,3 +4,6 @@
 [submodule "src/iPX4"]
 	path = src/iPX4
 	url = https://github.com/mission-systems-pty-ltd/iPX4
+[submodule "thirdparty/sim/Firmware"]
+	path = thirdparty/sim/Firmware
+	url = https://github.com/PX4/Firmware.git
