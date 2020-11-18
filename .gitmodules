@@ -7,3 +7,6 @@
 [submodule "thirdparty/sim/Firmware"]
 	path = thirdparty/sim/Firmware
 	url = https://github.com/PX4/Firmware.git
+[submodule "thirdparty/sim/PX4-Autopilot"]
+	path = thirdparty/sim/PX4-Autopilot
+	url = https://github.com/PX4/PX4-Autopilot.git
