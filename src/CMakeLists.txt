@@ -16,7 +16,8 @@ INCLUDE_DIRECTORIES(${LOCAL_LIBRARY_DIRS})
 #============================================================================
 # ADD_SUBDIRECTORY(pMavlinkConverter)
 # ADD_SUBDIRECTORY(iArduSubComms)
-ADD_SUBDIRECTORY(pSetPointFeeder)
+# ADD_SUBDIRECTORY(pSetPointFeeder)
+ADD_SUBDIRECTORY(iMavlinkOffboardController)
 
 ##############################################################################
 #                           END of CMakeLists.txt

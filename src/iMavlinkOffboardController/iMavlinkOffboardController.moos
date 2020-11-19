@@ -1,0 +1,13 @@
+//------------------------------------------------
+// iMavlinkOffboardController config block
+
+ProcessConfig = iMavlinkOffboardController
+{
+   AppTick   = 6
+   CommsTick = 6
+
+   MODE = serial
+   PORT = /dev/ttyACM0
+   BAUD = 115200
+}
+
